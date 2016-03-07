@@ -1,2 +1,3 @@
-squeue -u geurney
+squeue -u shhgao
 ls out
+

@@ -7,6 +7,9 @@ au:
 co:
 	sbatch submit-co.sh $(input)
 
+co-p:
+	sbatch submit-co-pearson.sh $(input)
+
 re:
 	sbatch submit-re.sh $(matrix) $(user)
 

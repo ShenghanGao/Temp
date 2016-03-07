@@ -38,11 +38,11 @@ hdfs dfs -mkdir -p /user/$USER
 #hdfs dfs -put $WORKDIR/facebook_combined.txt /user/$USER/
 #hdfs dfs -put $WORKDIR/data/simple1 /user/$USER/simple1
 #hdfs dfs -put $WORKDIR/data/convertedOut/$1.seq  /user/$USER/input.seq
-hdfs dfs -put $WORKDIR/data/$1.txt  /user/$USER/input.txt
+hdfs dfs -put $WORKDIR/$1.txt  /user/$USER/input.txt
 
 # spark-submit co_matrix.py /user/$USER/input.seq output
 #spark-submit co_matrix.py /user/$USER/input.seq output
-spark-submit co_matrix2.py /user/$USER/input.txt output
+spark-submit co_matrix2_spark.py /user/$USER/input.txt output
 
 #copy out 
 rm -f out/co.txt >/dev/null || true

@@ -2,7 +2,7 @@
 #SBATCH --job-name="importer"
 #SBATCH --output="importer.%j.%N.out"
 #SBATCH --partition=compute
-#SBATCH --nodes=1
+#SBATCH --nodes=24
 #SBATCH --ntasks-per-node=24
 #SBATCH -t 00:55:00
 

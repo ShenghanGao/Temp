@@ -1,5 +1,8 @@
 import sys
 import re
+import math
+
+from pyspark import SparkContext
 
 avgTs = {}
 
@@ -8,6 +11,9 @@ def flat_Map(document):
 
 def flat_Line(line):
     line_split = line.split()
+    print "my_line_split:"
+    print line_split
+
     user = line_split[0]
     del line_split[0]
     tuples = []
@@ -38,7 +44,7 @@ def reduce_Sum(value1, value2):
 def map_Average(tuple):
     key = tuple[0]
     ((rating1Sum, rating2Sum), cnt) = tuple[1]
-    return (key, (rating1Sum / cnt, rating2Sum / cnt))
+    return (key, (float(rating1Sum) / cnt, float(rating2Sum) / cnt))
 
 def map_MiddleMul(tuple):
     key = tuple[0]
@@ -52,7 +58,7 @@ def map_MiddleMul(tuple):
 
 def reduce_MiddleMulSum(value1, value2):
     (mul1_1, mul2_1, mul3_1) = value1
-    (mul1_2, mul2_2, mul3_3) = value1
+    (mul1_2, mul2_2, mul3_2) = value2
     return (mul1_1 + mul1_2, mul2_1 + mul2_2, mul3_1 + mul3_2)
 
 def map_sim((key, (v1, v2, v3))):
@@ -60,24 +66,37 @@ def map_sim((key, (v1, v2, v3))):
         v2 = 1
     if v3 == 0:
         v3 = 1
-    return (key, v1 / (v2 * v3))
+    return (key, v1 / math.sqrt(v2 * v3))
 
 def co_matrix(file_name, output="co_matrix.out"):
     sc = SparkContext("local[8]", "UserArtistMatrix")
     file = sc.textFile(file_name)
-
+    print "my_file:"
+    print file.collect() 
+    """
     ts = file.flatMap(flat_Map)\
         .flatMap(flat_Line)
+    """
  
-    ts = file..flatMap(flat_Line)
+    ts = file.flatMap(flat_Line)
+    print "my_ts:"
+    print ts.collect() 
     reducedTs = ts.reduceByKey(reduce_Sum)
+    print "my_reducedTs:"
+    print reducedTs.collect() 
     global avgTs
     avgTs = reducedTs.map(map_Average).collectAsMap()
+    print "my_avgTs:"
+    print avgTs 
     middleMul = ts.map(map_MiddleMul)
+    print "my_middleMul:"
+    print middleMul.collect() 
     reducedMulSum = middleMul.reduceByKey(reduce_MiddleMulSum)
+    print "my_reduceMulSum:"
+    print reducedMulSum.collect() 
     sim = reducedMulSum.map(map_sim)
+    sim.map(lambda x: "(%d, %d)\t%f" %(x[0][0], x[0][1], x[1])).coalesce(1).saveAsTextFile(output)
 
-    print sim.collect()
 
 """ Do not worry about this """
 if __name__ == "__main__":

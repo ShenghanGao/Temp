@@ -7,8 +7,8 @@
 #SBATCH --job-name="sparkpython-demo"
 #SBATCH --output="sparkwc.%j.%N.out"
 #SBATCH --partition=compute
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=2
+#SBATCH --nodes=24
+#SBATCH --ntasks-per-node=24
 #SBATCH --export=ALL
 #SBATCH -t 00:30:00
 
@@ -35,9 +35,10 @@ myspark start
 hdfs dfs -mkdir -p /user/$USER
 #hdfs dfs -put $WORKDIR/facebook_combined.txt /user/$USER/
 #hdfs dfs -put $WORKDIR/data/simple1 /user/$USER/simple1
-hdfs dfs -put $WORKDIR/data/convertedOut/$1.seq  /user/$USER/input.seq
+#hdfs dfs -put $WORKDIR/data/convertedOut/$1.seq  /user/$USER/input.seq
+hdfs dfs -put $WORKDIR/data/$1 /user/$USER/input.txt
 
-spark-submit artist_user_matrix.py /user/$USER/input.seq output
+spark-submit artist_user_matrix_text.py /user/$USER/input.txt output
 
 #copy out 
 rm -f out/au.txt >/dev/null || true
